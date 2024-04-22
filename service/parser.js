@@ -1,7 +1,4 @@
-// import db from "./db/db";
-
 const fs = require('fs');
-
 class ParserObjectDescriptor {
 	constructor(fieldsDescriptors, subobjects) {
 		this.fieldsDescriptors = fieldsDescriptors;
@@ -100,7 +97,7 @@ function submitDuplicatableObject(storage, name, instance) {
 	}
 }
 
-export function parseObject(type, rows) {
+function parseObject(type, rows) {
 	if (!type in types) {
 		throw new Error(`Type[${type}] not found in type descriptors`)
 	}
@@ -150,14 +147,6 @@ export function parseObject(type, rows) {
 	return objectResult;
 }
 
-// // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
-const filePath = './dump/dump.txt';
-const fileContents = fs.readFileSync(filePath, 'utf8');
-const lines = fileContents.split('\n');
-
-const result = parseObject('.', lines)
-console.log(JSON.stringify(result, '', 2))
-
 function prepareEmployeesDataToInsert(employees){
 	const employeesData = [];
 	const employeeIds = new Set()
@@ -187,7 +176,13 @@ function prepareEmployeesDataToInsert(employees){
 				}
 
 				if (employee["Donation"]){
-					employee["Donation"].forEach((donation) => donations.push({...donation, 'employee_id': employee.id}))
+			  	if(Array.isArray(employee["Donation"])){
+					  employee["Donation"].forEach((donation) => donations.push({...donation, 'employee_id': employee.id}))
+		  		}else{
+					  employee["Donation"]['employee_id'] =  employee.id;
+					  donations.push(employee["Donation"])
+				  }
+
 				}
 			}
 		 }
@@ -196,18 +191,10 @@ function prepareEmployeesDataToInsert(employees){
 
 	return {
 		'Department': departments,
-		'Employee': employees,
+		'Employee': employeesData,
 		'Salary': salaries,
 		'Donation': donations
 	}
 }
 
-
-if (result){
-	const employeesData = prepareEmployeesDataToInsert(result["E-List"]["Employee"])
-// 	const ratesData = result["Rates"]["Rate"]
-//
-// const test =	 db.insert(employeesData['Department'])
-// 			.into('Department')
-// 	console.log('test', test)
-}
+module.exports = {prepareEmployeesDataToInsert, parseObject}
