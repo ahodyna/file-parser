@@ -68,7 +68,8 @@ function parseValue(value, type) {
 	} else if (type === "number") {
 		return Number(value.trim())
 	} else if (type === "date") {
-		return value.trim() // TODO: parse date
+   	const normalizedDate = 	new Date(value.trim()).toDateString()
+		return  normalizedDate || value.trim();
 	} else if (type === "currency") {
 		return value.trim()
 	} else {
@@ -172,17 +173,25 @@ function prepareEmployeesDataToInsert(employees){
 				}
 
 				if (employee["Salary"]["Statement"]){
-				employee["Salary"]["Statement"].forEach((salary) => salaries.push({...salary, 'employee_id': employee.id}))
+				employee["Salary"]["Statement"].forEach((salary) => salaries.push({id: salary.id, amount: Number(salary.amount), date: salary.date, 'employee_id': employee.id}))
 				}
 
 				if (employee["Donation"]){
 			  	if(Array.isArray(employee["Donation"])){
-					  employee["Donation"].forEach((donation) => donations.push({...donation, 'employee_id': employee.id}))
+					  employee["Donation"].forEach((donation) => {
+						  const amountWithCurrency = donation.amount.split(" ");
+							const amount = Number(amountWithCurrency[0]);
+							const currency = String(amountWithCurrency[1]);
+							donations.push({...donation, amount: amount, currency: currency, 'employee_id': employee.id})})
 		  		}else{
+					  const amountWithCurrency = employee["Donation"].amount.split(" ");
+					  const amount = Number(amountWithCurrency[0]);
+					  const currency = String(amountWithCurrency[1]);
+					  employee["Donation"].amount = amount;
+					  employee["Donation"].currency = currency;
 					  employee["Donation"]['employee_id'] =  employee.id;
 					  donations.push(employee["Donation"])
 				  }
-
 				}
 			}
 		 }

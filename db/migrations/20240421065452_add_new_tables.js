@@ -11,7 +11,7 @@ exports.up = function(knex) {
     })
         .createTable('Salary', table => {
           table.integer('id').unique()
-          table.integer('amount');
+          table.float('amount');
           table.date('date');
           table.integer('employee_id')
           table.timestamps(true, true);
@@ -19,7 +19,7 @@ exports.up = function(knex) {
         .createTable('Donation', table => {
           table.integer('id').unique()
           table.date('date');
-          table.integer('amount');
+          table.float('amount');
           table.string('currency');
           table.integer('employee_id')
           table.timestamps(true, true);
@@ -27,7 +27,7 @@ exports.up = function(knex) {
         .createTable('Rate', table => {
           table.increments('id')
           table.date('date');
-          table.integer('value');
+          table.float('value');
           table.string('sign');
           table.timestamps(true, true);
         })
