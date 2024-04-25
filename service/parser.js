@@ -1,11 +1,11 @@
 const fs = require('fs');
+
 class ParserObjectDescriptor {
 	constructor(fieldsDescriptors, subobjects) {
 		this.fieldsDescriptors = fieldsDescriptors;
 		this.subobjects = subobjects;
 	}
 }
-
 
 const types = {
 	".": new ParserObjectDescriptor(
@@ -68,8 +68,8 @@ function parseValue(value, type) {
 	} else if (type === "number") {
 		return Number(value.trim())
 	} else if (type === "date") {
-   	const normalizedDate = 	new Date(value.trim()).toDateString()
-		return  normalizedDate || value.trim();
+		const normalizedDate = new Date(value.trim()).toDateString()
+		return normalizedDate || value.trim();
 	} else if (type === "currency") {
 		return value.trim()
 	} else {
@@ -148,7 +148,7 @@ function parseObject(type, rows) {
 	return objectResult;
 }
 
-function prepareEmployeesDataToInsert(employees){
+function prepareEmployeesDataToInsert(employees) {
 	const employeesData = [];
 	const employeeIds = new Set()
 	const departments = [];
@@ -157,45 +157,51 @@ function prepareEmployeesDataToInsert(employees){
 	const donations = []
 
 	employees.forEach(employee => {
-		if (employee.id) {
-			if (!employeeIds.has(employee.id)) {
-				employeeIds.add(employee.id)
-				employeesData.push({
-					id: employee.id,
-					name: employee.name,
-					surname: employee.surname,
-					department_id: employee["Department"].id
-				});
+				if (employee.id) {
+					if (!employeeIds.has(employee.id)) {
+						employeeIds.add(employee.id)
+						employeesData.push({
+							id: employee.id,
+							name: employee.name,
+							surname: employee.surname,
+							department_id: employee["Department"].id
+						});
 
-				if (!departmentIds.has(employee["Department"].id)) {
-					departmentIds.add(employee["Department"].id)
-					departments.push(employee["Department"]);
-				}
+						if (!departmentIds.has(employee["Department"].id)) {
+							departmentIds.add(employee["Department"].id)
+							departments.push(employee["Department"]);
+						}
 
-				if (employee["Salary"]["Statement"]){
-				employee["Salary"]["Statement"].forEach((salary) => salaries.push({id: salary.id, amount: Number(salary.amount), date: salary.date, 'employee_id': employee.id}))
-				}
+						if (employee["Salary"]["Statement"]) {
+							employee["Salary"]["Statement"].forEach((salary) => salaries.push({
+								id: salary.id,
+								amount: Number(salary.amount),
+								date: salary.date,
+								'employee_id': employee.id
+							}))
+						}
 
-				if (employee["Donation"]){
-			  	if(Array.isArray(employee["Donation"])){
-					  employee["Donation"].forEach((donation) => {
-						  const amountWithCurrency = donation.amount.split(" ");
-							const amount = Number(amountWithCurrency[0]);
-							const currency = String(amountWithCurrency[1]);
-							donations.push({...donation, amount: amount, currency: currency, 'employee_id': employee.id})})
-		  		}else{
-					  const amountWithCurrency = employee["Donation"].amount.split(" ");
-					  const amount = Number(amountWithCurrency[0]);
-					  const currency = String(amountWithCurrency[1]);
-					  employee["Donation"].amount = amount;
-					  employee["Donation"].currency = currency;
-					  employee["Donation"]['employee_id'] =  employee.id;
-					  donations.push(employee["Donation"])
-				  }
+						if (employee["Donation"]) {
+							if (Array.isArray(employee["Donation"])) {
+								employee["Donation"].forEach((donation) => {
+									const amountWithCurrency = donation.amount.split(" ");
+									const amount = Number(amountWithCurrency[0]);
+									const currency = String(amountWithCurrency[1]);
+									donations.push({...donation, amount: amount, currency: currency, 'employee_id': employee.id})
+								})
+							} else {
+								const amountWithCurrency = employee["Donation"].amount.split(" ");
+								const amount = Number(amountWithCurrency[0]);
+								const currency = String(amountWithCurrency[1]);
+								employee["Donation"].amount = amount;
+								employee["Donation"].currency = currency;
+								employee["Donation"]['employee_id'] = employee.id;
+								donations.push(employee["Donation"])
+							}
+						}
+					}
 				}
 			}
-		 }
-		}
 	)
 
 	return {

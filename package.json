@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "migrate": "npx knex migrate:latest --knexfile db/knexfile.js",
-    "dev": "node index.js && npx knex migrate:latest --knexfile db/knexfile.js"
+    "dev": " npx knex migrate:latest --knexfile db/knexfile.js && node index.js"
   },
   "author": "",
   "license": "ISC",
