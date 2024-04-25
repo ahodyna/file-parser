@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 class ParserObjectDescriptor {
 	constructor(fieldsDescriptors, subobjects) {
 		this.fieldsDescriptors = fieldsDescriptors;
